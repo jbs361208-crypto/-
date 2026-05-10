@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>실시간 날씨 대시보드 🌤️</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', 'Malgun Gothic', '맑은 고딕', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      color: #e0e0e0;
+      padding: 20px;
+    }
+    h1 { text-align: center; font-size: 2rem; margin-bottom: 8px; color: #ffffff; text-shadow: 0 0 20px rgba(100,180,255,0.5); }
+    .subtitle { text-align: center; font-size: 0.85rem; color: #8899bb; margin-bottom: 24px; }
+    .search-area { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+    .search-area select, .search-area button { padding: 12px 20px; border-radius: 30px; border: none; font-size: 1rem; cursor: pointer; transition: all 0.3s; }
+    .search-area select { background: rgba(255,255,255,0.1); color: #fff; min-width: 160px; border: 1px solid rgba(255,255,255,0.2); }
+    .search-area select option { background: #1a1a2e; color: #fff; }
+    .search-area button { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; font-weight: bold; padding: 12px 30px; }
+    .search-area button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,172,254,0.4); }
+    .card { background: rgba(255,255,255,0.07); border-radius: 20px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+    .main-weather { max-width: 900px; margin: 0 auto 24px; }
+    .weather-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+    .city-name { font-size: 1.8rem; font-weight: bold; color: #fff; }
+    .update-time { font-size: 0.8rem; color: #8899bb; margin-top: 4px; }
+    .temp-big { font-size: 4rem; font-weight: 300; color: #4facfe; line-height: 1; }
+    .weather-icon-big { font-size: 3.5rem; margin-bottom: 4px; }
+    .sky-label { font-size: 1.1rem; color: #ccd; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px; margin-bottom: 24px; }
+    .info-item { background: rgba(255,255,255,0.05); border-radius: 14px; padding: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.08); }
+    .info-label { font-size: 0.75rem; color: #8899bb; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { font-size: 1.4rem; font-weight: bold; color: #fff; }
+    .info-icon { font-size: 1.5rem; margin-bottom: 6px; }
+    .recommend-banner { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .banner-item { flex: 1; min-width: 200px; background: rgba(79,172,254,0.15); border: 1px solid rgba(79,172,254,0.3); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+    .banner-item.rain { background: rgba(0,242,254,0.1); border-color: rgba(0,242,254,0.3); }
+    .banner-item.outfit { background: rgba(255,165,0,0.1); border-color: rgba(255,165,0,0.3); }
+    .banner-icon { font-size: 1.8rem; }
+    .banner-text { font-size: 0.9rem; color: #dde; line-height: 1.4; }
+    .banner-text strong { color: #fff; display: block; margin-bottom: 2px; }
+    .hourly-section { max-width: 900px; margin: 0 auto 24px; }
+    .section-title { font-size: 1.1rem; font-weight: bold; color: #aaccff; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .hourly-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+    .hourly-scroll::-webkit-scrollbar { height: 4px; }
+    .hourly-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 2px; }
+    .hourly-scroll::-webkit-scrollbar-thumb { background: rgba(79,172,254,0.5); border-radius: 2px; }
+    .hourly-item { min-width: 80px; background: rgba(255,255,255,0.05); border-radius: 14px; padding: 14px 10px; text-align: center; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; transition: all 0.2s; }
+    .hourly-item:hover { background: rgba(79,172,254,0.15); border-color: rgba(79,172,254,0.3); transform: translateY(-3px); }
+    .hourly-item.current { background: rgba(79,172,254,0.2); border-color: rgba(79,172,254,0.5); }
+    .hourly-time { font-size: 0.8rem; color: #8899bb; margin-bottom: 8px; }
+    .hourly-icon { font-size: 1.5rem; margin-bottom: 6px; }
+    .hourly-temp { font-size: 1.1rem; font-weight: bold; color: #fff; margin-bottom: 4px; }
+    .hourly-pop { font-size: 0.75rem; color: #4facfe; }
+    .loading { text-align: center; padding: 60px 20px; font-size: 1.2rem; color: #8899bb; }
+    .loading .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #4facfe; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-msg { text-align: center; padding: 40px; color: #ff6b6b; background: rgba(255,107,107,0.1); border-radius: 14px; border: 1px solid rgba(255,107,107,0.2); }
+    @media (max-width: 600px) { h1 { font-size: 1.5rem; } .temp-big { font-size: 3rem; } .info-grid { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+  <h1>🌤️ 실시간 날씨 대시보드</h1>
+  <p class="subtitle">공공데이터 포털 기상청 단기예보 API 활용</p>
+
+  <div class="search-area">
+    <select id="citySelect">
+      <option value="서울|60|127">서울</option>
+      <option value="부산|98|76">부산</option>
+      <option value="대구|89|90">대구</option>
+      <option value="인천|55|124">인천</option>
+      <option value="광주|58|74">광주</option>
+      <option value="대전|67|100">대전</option>
+      <option value="울산|102|84">울산</option>
+      <option value="수원|60|121">수원</option>
+      <option value="춘천|73|134">춘천</option>
+      <option value="강릉|92|131">강릉</option>
+      <option value="청주|69|106">청주</option>
+      <option value="전주|63|89">전주</option>
+      <option value="제주|52|38">제주</option>
+    </select>
+    <button onclick="loadWeather()">🔍 날씨 조회</button>
+  </div>
+
+  <div id="weatherResult"></div>
+
+  <script>
+    // ============================================================
+    // 공공데이터 포털 API 인증키
+    // ============================================================
+    const API_KEY = "9b5fbef6005a654434d6dc4b72dd93bb6011d4efaa00b41002f7a9760a055324";
+    const BASE_URL = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
+
+    const SKY_CODE = { "1": ["맑음", "☀️"], "3": ["구름많음", "⛅"], "4": ["흐림", "☁️"] };
+    const PTY_CODE = { "0": ["없음", ""], "1": ["비", "🌧️"], "2": ["비/눈", "🌨️"], "3": ["눈", "❄️"], "4": ["소나기", "⛈️"] };
+
+    function getWeatherIcon(sky, pty) {
+      if (pty && pty !== "0") return PTY_CODE[pty]?.[1] || "🌧️";
+      return SKY_CODE[sky]?.[1] || "🌤️";
+    }
+    function getWeatherText(sky, pty) {
+      if (pty && pty !== "0") return PTY_CODE[pty]?.[0] || "비";
+      return SKY_CODE[sky]?.[0] || "맑음";
+    }
+    function getOutfitRecommend(temp) {
+      const t = parseFloat(temp);
+      if (t >= 28) return "반팔, 반바지";
+      if (t >= 23) return "얇은 셔츠, 면바지";
+      if (t >= 17) return "가디건, 청바지";
+      if (t >= 12) return "자켓, 긴바지";
+      if (t >= 5)  return "코트, 두꺼운 니트";
+      return "패딩, 목도리, 장갑";
+    }
+
+    function getBaseDateTime() {
+      const now = new Date();
+      const baseHours = [2, 5, 8, 11, 14, 17, 20, 23];
+      let curH = now.getHours();
+      let baseH = baseHours[0];
+      for (const h of baseHours) { if (curH >= h) baseH = h; }
+      if (curH === baseH && now.getMinutes() < 10) {
+        const idx = baseHours.indexOf(baseH);
+        baseH = idx > 0 ? baseHours[idx - 1] : baseHours[baseHours.length - 1];
+      }
+      const pad = n => String(n).padStart(2, '0');
+      const baseDate = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
+      const baseTime = `${pad(baseH)}00`;
+      return { baseDate, baseTime };
+    }
+
+    function parseCurrentWeather(items) {
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const todayStr = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
+      const curTimeStr = `${pad(now.getHours())}00`;
+      const weather = {};
+      for (const item of items) {
+        if (item.fcstDate === todayStr && item.fcstTime >= curTimeStr) {
+          if (!(item.category in weather)) weather[item.category] = item.fcstValue;
+        }
+      }
+      return weather;
+    }
+
+    function parseHourlyForecast(items, hours = 12) {
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const todayStr = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
+      const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = `${tomorrow.getFullYear()}${pad(tomorrow.getMonth()+1)}${pad(tomorrow.getDate())}`;
+      const hourly = {};
+      for (const item of items) {
+        if (item.fcstDate === todayStr || item.fcstDate === tomorrowStr) {
+          const key = `${item.fcstDate}_${item.fcstTime}`;
+          if (!hourly[key]) hourly[key] = { date: item.fcstDate, time: item.fcstTime };
+          hourly[key][item.category] = item.fcstValue;
+        }
+      }
+      return Object.values(hourly)
+        .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+        .slice(0, hours);
+    }
+
+    async function loadWeather() {
+      const sel = document.getElementById('citySelect');
+      const [cityName, nx, ny] = sel.value.split('|');
+      const resultDiv = document.getElementById('weatherResult');
+      resultDiv.innerHTML = `<div class="loading"><div class="spinner"></div><p>${cityName} 날씨 데이터를 불러오는 중...</p></div>`;
+
+      const { baseDate, baseTime } = getBaseDateTime();
+      const apiUrl = `${BASE_URL}?serviceKey=${API_KEY}&pageNo=1&numOfRows=1000&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`;
+      // CORS 프록시 사용 (GitHub Pages 배포용)
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+
+      try {
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const proxyData = await res.json();
+        const data = JSON.parse(proxyData.contents);
+
+        const header = data?.response?.header;
+        if (header?.resultCode !== '00') throw new Error(`API 오류: ${header?.resultMsg}`);
+
+        const items = data.response.body.items.item;
+        const current = parseCurrentWeather(items);
+        const hourly = parseHourlyForecast(items);
+        renderWeather(cityName, current, hourly, baseDate, baseTime);
+      } catch (err) {
+        resultDiv.innerHTML = `<div class="error-msg"><p>⚠️ 날씨 데이터를 불러오지 못했습니다.</p><p style="font-size:0.85rem;margin-top:8px;color:#ff9999;">${err.message}</p></div>`;
+      }
+    }
+
+    function renderWeather(cityName, current, hourly, baseDate, baseTime) {
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const timeStr = `${now.getFullYear()}년 ${pad(now.getMonth()+1)}월 ${pad(now.getDate())}일 ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      const temp = current.TMP || current.T1H || 'N/A';
+      const sky = current.SKY || '1';
+      const pty = current.PTY || '0';
+      const pop = current.POP || '0';
+      const reh = current.REH || 'N/A';
+      const wsd = current.WSD || 'N/A';
+      const tmn = current.TMN || 'N/A';
+      const tmx = current.TMX || 'N/A';
+      const weatherIcon = getWeatherIcon(sky, pty);
+      const weatherText = getWeatherText(sky, pty);
+      const needUmbrella = parseInt(pop) >= 60 || pty !== '0';
+      const outfit = getOutfitRecommend(temp);
+
+      const hourlyHTML = hourly.map((h, i) => {
+        const hIcon = getWeatherIcon(h.SKY, h.PTY);
+        const hTime = h.time.slice(0, 2) + '시';
+        const hPop = h.POP || '0';
+        return `<div class="hourly-item ${i === 0 ? 'current' : ''}">
+          <div class="hourly-time">${hTime}</div>
+          <div class="hourly-icon">${hIcon}</div>
+          <div class="hourly-temp">${h.TMP || h.T1H || '--'}°</div>
+          <div class="hourly-pop">💧${hPop}%</div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('weatherResult').innerHTML = `
+        <div class="main-weather card">
+          <div class="weather-header">
+            <div>
+              <div class="city-name">📍 ${cityName}</div>
+              <div class="update-time">기준: ${baseDate.slice(0,4)}.${baseDate.slice(4,6)}.${baseDate.slice(6,8)} ${baseTime.slice(0,2)}:00 발표 | 조회: ${timeStr}</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="weather-icon-big">${weatherIcon}</div>
+              <div class="sky-label">${weatherText}</div>
+            </div>
+          </div>
+          <div style="text-align:center; margin-bottom:24px;">
+            <div class="temp-big">${temp}°C</div>
+            ${tmn !== 'N/A' && tmx !== 'N/A' ? `<div style="color:#8899bb;font-size:0.9rem;margin-top:6px;">최저 ${tmn}° / 최고 ${tmx}°</div>` : ''}
+          </div>
+          <div class="info-grid">
+            <div class="info-item"><div class="info-icon">💧</div><div class="info-label">강수 확률</div><div class="info-value">${pop}%</div></div>
+            <div class="info-item"><div class="info-icon">💦</div><div class="info-label">습도</div><div class="info-value">${reh}%</div></div>
+            <div class="info-item"><div class="info-icon">💨</div><div class="info-label">풍속</div><div class="info-value">${wsd}<span style="font-size:0.8rem">m/s</span></div></div>
+            <div class="info-item"><div class="info-icon">🌡️</div><div class="info-label">현재 기온</div><div class="info-value">${temp}°</div></div>
+          </div>
+          <div class="recommend-banner">
+            <div class="banner-item rain">
+              <div class="banner-icon">${needUmbrella ? '☂️' : '✅'}</div>
+              <div class="banner-text"><strong>우산 ${needUmbrella ? '필요' : '불필요'}</strong>강수 확률 ${pop}% · ${weatherText}</div>
+            </div>
+            <div class="banner-item outfit">
+              <div class="banner-icon">👕</div>
+              <div class="banner-text"><strong>오늘 옷차림 추천</strong>${outfit}</div>
+            </div>
+          </div>
+        </div>
+        <div class="hourly-section card">
+          <div class="section-title">⏰ 시간별 예보 (12시간)</div>
+          <div class="hourly-scroll">${hourlyHTML}</div>
+        </div>`;
+    }
+
+    window.onload = () => loadWeather();
+  </script>
+</body>
+</html>
