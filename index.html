@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>기상청 단기예보 | 1208 김태건</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a1628;--card:rgba(255,255,255,.06);--border:rgba(255,255,255,.10);--accent:#4fc3f7;--accent2:#81d4fa;--danger:#ef5350;--text:#e3f2fd;--muted:#90a4ae;--r:18px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(79,195,247,.18) 0%,transparent 55%),radial-gradient(ellipse at 80% 70%,rgba(100,181,246,.12) 0%,transparent 50%),linear-gradient(160deg,#0a1628 0%,#0d2044 60%,#0a1628 100%);z-index:0}
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:28px 18px 60px}
+header{text-align:center;margin-bottom:26px}
+h1{font-family:'Black Han Sans',sans-serif;font-size:clamp(1.8rem,5vw,3rem);background:linear-gradient(90deg,var(--accent),#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:300%;animation:sh 4s linear infinite}
+@keyframes sh{0%{background-position:0%}100%{background-position:300%}}
+.sub{color:var(--muted);font-size:.85rem;margin-top:5px;letter-spacing:.1em}
+.badge{display:inline-block;margin-top:8px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0a1628;font-weight:700;font-size:.76rem;letter-spacing:.1em;padding:4px 14px;border-radius:999px}
+.sw{display:flex;gap:10px;justify-content:center;margin-bottom:22px;flex-wrap:wrap}
+select,.btn{height:46px;border-radius:12px;border:1.5px solid var(--border);background:rgba(255,255,255,.07);color:var(--text);font-family:inherit;font-size:.93rem;padding:0 16px;cursor:pointer}
+select:focus{border-color:var(--accent);outline:none}
+.btn{background:linear-gradient(135deg,var(--accent),#1e88e5);border:none;color:#0a1628;font-weight:700;padding:0 24px}
+.btn:hover{filter:brightness(1.1)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 15px 13px;display:flex;flex-direction:column;gap:5px;backdrop-filter:blur(12px);transition:transform .2s,border-color .2s;animation:fu .5s ease both}
+.card:hover{transform:translateY(-4px);border-color:var(--accent)}
+@keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.ci{font-size:1.8rem}.cl{font-size:.72rem;color:var(--muted);letter-spacing:.07em;text-transform:uppercase}
+.cv{font-family:'Black Han Sans',sans-serif;font-size:1.75rem;color:var(--accent);line-height:1}
+.cu{font-size:.76rem;color:var(--muted)}
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px;margin-bottom:24px}
+.rc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;backdrop-filter:blur(10px);animation:fu .6s ease both}
+.rt{font-weight:700;font-size:.85rem;color:var(--accent2);margin-bottom:5px}
+.rv{font-size:.9rem;line-height:1.6}
+.st{font-family:'Black Han Sans',sans-serif;font-size:1.05rem;letter-spacing:.05em;margin-bottom:10px;color:var(--accent2)}
+.fw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--r);overflow:hidden;font-size:.84rem}
+th{background:rgba(79,195,247,.14);color:var(--accent);padding:10px 10px;text-align:center;font-weight:700;white-space:nowrap}
+td{padding:9px 10px;text-align:center;border-top:1px solid var(--border);white-space:nowrap}
+tr:hover td{background:rgba(79,195,247,.07)}
+#status{text-align:center;padding:28px;color:var(--muted);font-size:.9rem}
+.sp{display:inline-block;width:20px;height:20px;border:3px solid rgba(79,195,247,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+footer{text-align:center;margin-top:40px;color:var(--muted);font-size:.74rem;letter-spacing:.07em}
+footer strong{color:var(--accent)}
+@media(max-width:480px){.cards{grid-template-columns:repeat(2,1fr)}.cv{font-size:1.4rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>⛅ 기상청 단기예보</h1>
+    <p class="sub">공공데이터 포털 기상청 단기예보 조회서비스</p>
+    <span class="badge">학번 1208 · 김태건</span>
+  </header>
+  <div class="sw">
+    <select id="reg">
+      <option value="55,127">서울</option>
+      <option value="55,124">인천</option>
+      <option value="89,90">대전</option>
+      <option value="102,84">대구</option>
+      <option value="98,76">부산</option>
+      <option value="58,74">광주</option>
+      <option value="73,134">강릉</option>
+      <option value="60,120">수원</option>
+      <option value="67,100" selected>전주</option>
+      <option value="52,38">제주</option>
+    </select>
+    <button class="btn" onclick="go()">🔍 조회하기</button>
+  </div>
+  <div id="status"><span class="sp"></span> 날씨 데이터를 불러오는 중...</div>
+  <div class="cards" id="cards" style="display:none"></div>
+  <div id="rec" style="display:none">
+    <p class="st">💡 오늘의 추천</p>
+    <div class="rg" id="rg"></div>
+  </div>
+  <div id="tbl" style="display:none;margin-top:8px">
+    <p class="st">📅 시간별 단기예보</p>
+    <div class="fw">
+      <table>
+        <thead><tr><th>날짜</th><th>시간</th><th>날씨</th><th>기온(℃)</th><th>강수확률(%)</th><th>강수형태</th><th>풍속(m/s)</th><th>습도(%)</th></tr></thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+  </div>
+  <footer>
+    <p>데이터 출처: <strong>기상청 단기예보 조회서비스</strong> | 공공데이터포털 Open API</p>
+    <p style="margin-top:4px">© 2025 학번 1208 김태건</p>
+  </footer>
+</div>
+<script>
+const KEY='2b3ef7c728c0499c885f27a7207a5ff41d026dd007ee5b53a11853ffcf28046d';
+const SKY={'1':'☀️ 맑음','3':'⛅ 구름많음','4':'☁️ 흐림'};
+const PTY={'0':'없음','1':'🌧 비','2':'🌨 비/눈','3':'❄️ 눈','4':'🌦 소나기'};
+function sky(s,p){return(p&&p!=='0')?(PTY[p]||p):(SKY[s]||'-')}
+function base(){
+  const n=new Date(),h=n.getHours(),m=n.getMinutes();
+  const av=[2,5,8,11,14,17,20,23];
+  let b=23;
+  for(const t of av)if(h>t||(h===t&&m>=10))b=t;
+  const d=new Date(n);
+  if(b===23&&h<23)d.setDate(d.getDate()-1);
+  return{date:d.toISOString().slice(0,10).replace(/-/g,''),time:String(b).padStart(2,'0')+'00'};
+}
+function wdir(v){const d=['북','북동','동','남동','남','남서','서','북서'];return v!=null?' '+d[Math.round(Number(v)/45)%8]:'';}
+function st(m){document.getElementById('status').innerHTML=m}
+function sh(id){document.getElementById(id).style.display=''}
+function hi(id){document.getElementById(id).style.display='none'}
+
+async function go(){
+  const sel=document.getElementById('reg');
+  const name=sel.options[sel.selectedIndex].text;
+  const[nx,ny]=sel.value.split(',');
+  const{date,time}=base();
+  st('<span class="sp"></span> 기상청 API 조회 중...');
+  hi('cards');hi('rec');hi('tbl');
+  const api=`https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=${KEY}&pageNo=1&numOfRows=300&dataType=JSON&base_date=${date}&base_time=${time}&nx=${nx}&ny=${ny}`;
+  // 프록시 목록
+  const proxies=[
+    u=>`https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+    u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,
+  ];
+  for(const pf of proxies){
+    try{
+      const res=await fetch(pf(api));
+      if(!res.ok)continue;
+      const raw=await res.json();
+      // allorigins는 .contents 안에 문자열로 옴
+      const json=raw.contents?JSON.parse(raw.contents):raw;
+      const hdr=json?.response?.header;
+      if(!hdr||hdr.resultCode!=='00'){st('❌ API 오류: '+hdr?.resultMsg);return;}
+      parse(json.response.body.items.item,name);
+      return;
+    }catch(e){continue;}
+  }
+  st('❌ 조회 실패: 잠시 후 다시 시도하거나 GitHub Pages에 업로드 후 사용하세요.');
+}
+
+function parse(items,name){
+  const g={};
+  for(const it of items){
+    const k=it.fcstDate+'_'+it.fcstTime;
+    if(!g[k])g[k]={date:it.fcstDate,time:it.fcstTime};
+    g[k][it.category]=it.fcstValue;
+  }
+  const slots=Object.values(g).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  cards(slots[0]||{},name);
+  recs(slots[0]||{});
+  table(slots);
+  st('');
+}
+
+function cards(d,name){
+  const t=d.TMP??'--',p=d.POP??'--',w=d.WSD??'--',h=d.REH??'--',s=sky(d.SKY,d.PTY);
+  document.getElementById('cards').innerHTML=`
+    <div class="card" style="animation-delay:.05s"><div class="ci">📍</div><div class="cl">지역</div><div class="cv" style="font-size:1.2rem">${name}</div></div>
+    <div class="card" style="animation-delay:.1s"><div class="ci">${s.split(' ')[0]||'🌤'}</div><div class="cl">날씨</div><div class="cv" style="font-size:1rem">${s}</div></div>
+    <div class="card" style="animation-delay:.15s"><div class="ci">🌡️</div><div class="cl">기온</div><div class="cv">${t}</div><div class="cu">℃</div></div>
+    <div class="card" style="animation-delay:.2s"><div class="ci">🌂</div><div class="cl">강수확률</div><div class="cv" style="color:${Number(p)>60?'var(--danger)':'var(--accent)'}">${p}</div><div class="cu">%</div></div>
+    <div class="card" style="animation-delay:.25s"><div class="ci">💨</div><div class="cl">풍속</div><div class="cv">${w}</div><div class="cu">m/s${wdir(d.VEC)}</div></div>
+    <div class="card" style="animation-delay:.3s"><div class="ci">💧</div><div class="cl">습도</div><div class="cv">${h}</div><div class="cu">%</div></div>`;
+  sh('cards');
+}
+
+function recs(d){
+  const t=parseFloat(d.TMP??20),p=parseFloat(d.POP??0),w=parseFloat(d.WSD??0);
+  const umb=p>=60?'☂️ 우산 필수! 비 올 확률이 높습니다.':p>=30?'🌂 우산을 챙기는 걸 권장합니다.':'☀️ 우산 불필요합니다.';
+  const clo=t>=28?'👕 민소매·반팔·반바지':t>=23?'👔 반팔·얇은 셔츠':t>=18?'🧥 얇은 가디건·긴팔':t>=12?'🧣 자켓·후드티':t>=5?'🧤 코트·목도리':'🧥 두꺼운 패딩·방한 필수';
+  const win=w>=9?'💨 강풍 주의!':w>=5?'🌬️ 바람 강함. 외투 챙기세요.':'😊 바람 양호합니다.';
+  document.getElementById('rg').innerHTML=`
+    <div class="rc"><div class="rt">☂️ 우산 추천</div><div class="rv">${umb}</div></div>
+    <div class="rc"><div class="rt">👗 옷차림 추천</div><div class="rv">${clo}<br><span style="color:var(--muted);font-size:.75rem">${t}℃ 기준</span></div></div>
+    <div class="rc"><div class="rt">💨 바람 안내</div><div class="rv">${win}</div></div>`;
+  sh('rec');
+}
+
+function table(slots){
+  document.getElementById('tb').innerHTML=slots.slice(0,24).map(d=>{
+    const ds=d.date?`${d.date.slice(0,4)}-${d.date.slice(4,6)}-${d.date.slice(6,8)}`:'--';
+    const ts=d.time?`${d.time.slice(0,2)}:${d.time.slice(2,4)}`:'--';
+    const p=d.POP??'--';
+    return`<tr><td>${ds}</td><td>${ts}</td><td>${sky(d.SKY,d.PTY)}</td><td style="color:var(--accent);font-weight:700">${d.TMP??'--'}</td><td style="${Number(p)>60?'color:var(--danger)':''}">${p}</td><td>${PTY[d.PTY]??'없음'}</td><td>${d.WSD??'--'}</td><td>${d.REH??'--'}</td></tr>`;
+  }).join('');
+  sh('tbl');
+}
+
+window.onload=go;
+</script>
+</body>
+</html>
